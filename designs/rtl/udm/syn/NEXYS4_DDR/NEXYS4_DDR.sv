@@ -131,6 +131,23 @@ assign udm_bus.ack = udm_bus.req;   // bus always ready to accept request
 logic udm_csr_resp, udm_testmem_resp;
 logic [31:0] udm_csr_rdata;
 
+//////////////////////////////////////////////
+// bitonnic //
+//////////////////////////////////////////////
+
+logic [7:0][31:0] unsorted_list, sorted_list;
+
+Bitonic bitonic(
+    .original_list_i(unsorted_list), 
+    .sorted_list_o(sorted_list)
+);
+
+localparam CSR_INPUT_LIST_ADDR  = 32'h00000010;
+localparam CSR_OUTPUT_LIST_ADDR = 32'h00000018;
+
+//////////////////////////////////////////////
+//////////////////////////////////////////////
+
 // bus request
 always @(posedge clk_gen)
     begin
@@ -151,6 +168,11 @@ always @(posedge clk_gen)
             if (udm_bus.we)     // writing
                 begin
                 if (udm_bus.addr == CSR_LED_ADDR) LED <= udm_bus.wdata;
+
+                for (int i = 0; i < 8; i++) begin
+                    if (udm_bus.addr == CSR_INPUT_LIST_ADDR + i)   unsorted_list[i] <= udm_bus.wdata;
+                end
+                
                 end
             
             else                // reading
@@ -165,7 +187,17 @@ always @(posedge clk_gen)
                     udm_csr_resp <= 1'b1;
                     udm_csr_rdata <= SW;
                     end
+                
+                for (int i = 0; i < 8; i++) begin
+                    if (udm_bus.addr == CSR_OUTPUT_LIST_ADDR + i) 
+                    begin
+                    udm_csr_resp <= 1'b1;
+                    udm_csr_rdata <= sorted_list[i];
+                    end
+                end
+
                 udm_testmem_resp <= udm_testmem_enb;
+                
                 end
             end
         

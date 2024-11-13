@@ -80,6 +80,15 @@ localparam CSR_LED_ADDR         = 32'h00000000;
 localparam CSR_SW_ADDR          = 32'h00000004;
 localparam TESTMEM_ADDR         = 32'h80000000;
 
+localparam CSR_INPUT_LIST_ADDR  = 32'h00000010;
+localparam CSR_OUTPUT_LIST_ADDR = 32'h00000018;
+
+int my_bitonic_test_input[3][8] = '{
+   '{9, 7, 5, 3, 8, 2, 1, 6}, 
+   '{51, 160, 4, 77, 194, 223, 13, 84},
+   '{123456789, 987654321, 567890123, 109876543, 203456789, 345678901, 789012345, 198765432}
+};
+
 initial
     begin
     logic [31:0] wrdata [];
@@ -96,6 +105,28 @@ initial
 	udm.hreset();
 	WAIT(100);
 	
+	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////
+
+	$display ("### TEST BITONIC ###");
+	
+	foreach(my_bitonic_test_input[test_index]) begin
+	   foreach(my_bitonic_test_input[test_index][i]) $write("%0d, ", my_bitonic_test_input[test_index][i]); $write("\n");
+	   foreach(my_bitonic_test_input[test_index][i]) $write("%0h, ", my_bitonic_test_input[test_index][i]); $write("\n");
+	
+	   $display ("# writing (unordered)");
+	   foreach(my_bitonic_test_input[test_index][i]) udm.wr32(CSR_INPUT_LIST_ADDR + i, my_bitonic_test_input[test_index][i]);
+	
+	   $display ("# reading (sorted)");
+	   for (int i = 0; i < 8; i++) udm.rd32(CSR_OUTPUT_LIST_ADDR + i);
+	   
+	   $display ("### -------- ###");
+	   
+	   WAIT(100);
+	end
+
+	
+	$display ("### TEST MEMORY ###");
 	// memory initialization
 	udm.wr32(32'h80000000, 32'h112233cc);
 	udm.wr32(32'h80000004, 32'h55aa55aa);
