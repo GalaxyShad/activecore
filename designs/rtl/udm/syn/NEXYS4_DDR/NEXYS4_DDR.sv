@@ -139,7 +139,9 @@ logic [7:0][31:0] unsorted_list, sorted_list;
 
 Bitonic bitonic(
     .original_list_i(unsorted_list), 
-    .sorted_list_o(sorted_list)
+    .sorted_list_o(sorted_list),
+    .clk_i(clk_gen),
+    .rst_i(0)
 );
 
 localparam CSR_INPUT_LIST_ADDR  = 32'h00000010;
