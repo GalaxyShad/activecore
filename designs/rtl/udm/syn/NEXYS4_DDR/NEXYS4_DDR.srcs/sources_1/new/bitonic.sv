@@ -16,7 +16,10 @@ module Bitonic #(parameter LIST_SIZE = 8, parameter LIST_VALUE_BIT_COUNT = 32) (
 );
 
 logic [LIST_SIZE-1:0][LIST_VALUE_BIT_COUNT-1:0] buffer;
+reg [LIST_SIZE-1:0][LIST_VALUE_BIT_COUNT-1:0] sorted_list_reg;
 logic [3:0] stage = 0;
+
+assign sorted_list_o = sorted_list_reg;
 
 function void compare_and_swap(    
     inout logic [LIST_VALUE_BIT_COUNT-1:0] a,
@@ -87,7 +90,7 @@ always @* begin
         end    
 
         7: begin
-            sorted_list_o = buffer;
+            sorted_list_reg = buffer;
         end
     endcase
 end 
