@@ -22,7 +22,7 @@ function void compare_and_swap(
     inout logic [LIST_VALUE_BIT_COUNT-1:0] a,
     inout logic [LIST_VALUE_BIT_COUNT-1:0] b
 );
-    logic [31:0] temp;
+    logic[LIST_VALUE_BIT_COUNT-1:0] temp;
     if (a > b) begin
         temp = a;
         a = b;
